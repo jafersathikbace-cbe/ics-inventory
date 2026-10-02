@@ -1,119 +1,168 @@
 # ICS Inventory Management System
 
-A role-based inventory and production-order management system built with **Laravel 12**, **PHP 8.2+**, **SQLite/MySQL**, **Blade**, and **Tailwind CSS**.
+A role-based inventory and production-order management system built with **Laravel 12, PHP 8.2+, SQLite/MySQL, Blade, and Tailwind CSS**.
 
-The application manages raw materials, composite materials, product bills of materials (BOMs), stock movements, production orders, reports, notifications, and user permissions from a single web interface.
+The application manages raw materials, units, composite materials, product bills of materials (BOMs), stock movements, production orders, reports, notifications, and user permissions from a single web interface.
 
-## Core capabilities
+---
 
-- Role-based access control with Operator, Admin, and Super Admin roles
+## Application Preview
+
+### Inventory Dashboard
+
+The dashboard provides an overview of daily orders, order statuses, completed and dispatched orders, and low-stock materials.
+
+![ICS Inventory Dashboard](ics-inventory-dashboard.png)
+
+### Reports Management
+
+The reports section provides daily report generation, report history, PDF downloads, and optional Telegram delivery.
+
+![ICS Inventory Reports](ics-inventory-reports.png)
+
+### Generated Daily Report
+
+Generated reports contain order information grouped by status together with material stock, thresholds, units, and stock status.
+
+![ICS Inventory Daily Report](ics-inventory-daily-report.png)
+
+---
+
+## Overview
+
+ICS Inventory is designed to support inventory and production workflows where materials are converted into products through defined bills of materials.
+
+The system provides:
+
+- Role-based access control
 - Material and unit management
-- Composite-material definitions and nested BOM expansion
+- Composite-material definitions
+- Nested BOM expansion
 - Product BOM management
-- Stock checks, low-stock warnings, and transactional deductions
-- Order lifecycle tracking
+- Stock availability checks
+- Low-stock monitoring
+- Transactional stock deductions
+- Production-order lifecycle tracking
 - Stock movement audit logs
 - Daily PDF reports
-- In-app notifications and optional Telegram notifications
-- Scheduled report generation and report retention commands
-- Super Admin ownership transfer workflow
-- Profile and authentication management
+- In-app notifications
+- Optional Telegram notifications
+- Scheduled report generation
+- Report retention and cleanup
+- Super Admin ownership transfer
+- User and profile management
+- Authentication and authorization
 
-## Architecture
+---
 
-```text
-Browser
-  │
-  ▼
-Laravel Routes + Permission Middleware
-  │
-  ├── Controllers ──► Form validation
-  │        │
-  │        ├── Services ──► inventory / ownership / reporting / Telegram
-  │        │
-  │        └── Eloquent Models ──► SQLite / MySQL
-  │
-  └── Blade + Tailwind UI
-```
+## Core Capabilities
 
-Business-critical inventory operations are kept in services so controllers remain focused on HTTP concerns.
+### Role-Based Access Control
 
-## Local setup
+The application supports separate roles for different levels of access:
 
-Requirements:
+- **Operator**
+- **Admin**
+- **Super Admin**
 
-- PHP 8.2+
-- Composer
-- Node.js 20+
-- npm
-- SQLite or MySQL
+Authorization is enforced through application roles and permissions.
 
-```bash
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-npm install
-npm run build
-php artisan storage:link
-php artisan serve
-```
+---
 
-Set `SEED_DEFAULT_PASSWORD` in `.env` before running the seeders. The seeders create demo users for the three application roles.
+### Material and Unit Management
 
-## Testing
+Manage the materials used throughout the inventory system, including:
 
-```bash
-php artisan test
-```
+- Material definitions
+- Units of measurement
+- Stock quantities
+- Stock thresholds
+- Low-stock identification
 
-The repository also includes static PHP syntax validation and a GitHub Actions workflow.
+The dashboard can surface materials whose stock reaches the configured threshold.
 
-## Useful commands
+---
 
-Generate a daily report:
+### Composite Materials
 
-```bash
-php artisan reports:generate-daily 2026-01-31
-```
+The system supports composite materials that can be built from multiple underlying materials.
 
-Purge reports older than six months:
+Composite definitions can be expanded when calculating material requirements for production.
+
+This allows inventory calculations to account for materials that themselves contain other materials.
+
+---
+
+### Product Bills of Materials
+
+Products can have associated **Bills of Materials (BOMs)** defining the materials required to produce them.
+
+The inventory workflow uses these definitions to determine material requirements before stock deductions.
+
+---
+
+### Stock Management
+
+Inventory operations include:
+
+- Stock availability checks
+- Material quantity calculations
+- Low-stock monitoring
+- Stock deductions
+- Stock movement tracking
+- Transactional inventory updates
+
+Critical stock deductions are performed inside database transactions, with row locking during the final deduction step to help maintain inventory consistency.
+
+---
+
+### Production Orders
+
+The system provides an order lifecycle for production activities.
+
+Orders can be tracked through statuses including:
+
+- Received
+- In Progress
+- Completed
+- Dispatched
+
+The dashboard provides a daily summary of order activity and status distribution.
+
+---
+
+### Stock Movement Audit Logs
+
+Inventory changes are recorded through stock movement records.
+
+This provides a traceable history of inventory operations and supports auditing of stock changes.
+
+---
+
+### Daily PDF Reports
+
+The application generates daily inventory reports containing:
+
+- Orders grouped by status
+- Order number
+- Order creation time
+- User who placed the order
+- Product
+- Quantity
+- Material stock
+- Stock threshold
+- Unit
+- Stock status
+
+Reports can be generated manually and are also supported by scheduled report-generation commands.
+
+---
+
+### Report Retention
+
+Generated reports are retained according to the application's configured retention workflow.
+
+The project includes a command for removing reports older than six months:
 
 ```bash
 php artisan reports:purge-old
-```
-
-## Configuration
-
-Telegram notifications are optional. Configure the bot token and admin chat IDs in `.env` when required. The application can run without Telegram integration.
-
-## Security notes
-
-- Never commit `.env` or production credentials.
-- Demo seed passwords are configured through an environment variable.
-- Authorization is enforced with route-level permissions and roles.
-- Stock deductions occur inside database transactions and use row locks during the final deduction step.
-
-## Project structure
-
-```text
-app/
-├── Console/Commands/      Scheduled report commands
-├── Http/Controllers/      HTTP endpoints
-├── Http/Requests/         Request validation
-├── Models/                Eloquent models
-├── Services/              Business logic
-└── View/Components/       Blade components
-
-database/
-├── migrations/            Database schema
-└── seeders/               Roles and demo data
-
-resources/views/            Blade templates
-routes/                     Web and authentication routes
-tests/                      Feature and unit tests
-```
-
-## License
-
-This project is released under the MIT License.
