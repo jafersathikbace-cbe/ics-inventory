@@ -1,6 +1,6 @@
 # ICS Inventory Management System
 
-A role-based inventory and production-order management system built with **Laravel 12, PHP 8.2+, SQLite/MySQL, Blade, and Tailwind CSS**.
+A role-based inventory and production-order management system developed as a client project at **IT Core Solutions, Coimbatore**, built with **Laravel 12, PHP 8.2+, SQLite/MySQL, Blade, and Tailwind CSS**.
 
 The application manages raw materials, units, composite materials, product bills of materials (BOMs), stock movements, production orders, reports, notifications, and user permissions from a single web interface.
 
